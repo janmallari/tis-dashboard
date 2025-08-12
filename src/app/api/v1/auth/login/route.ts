@@ -33,8 +33,6 @@ export async function POST(request: Request) {
     );
   }
 
-  console.log(data.user);
-
   // Set session cookies for SSR
   // The supabase SSR client will handle cookies automatically
   return NextResponse.json({ user: data.user });
