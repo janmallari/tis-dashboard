@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: 'Reporting Tool Dashboard',
 };
 
-export default await async function RootLayout({
+export default await async function RootUnauthenticatedLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
