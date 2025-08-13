@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { UserProfile } from '@/lib/supabase/client';
 
 // This is sample data.
 const data = {
@@ -54,14 +55,16 @@ const data = {
       ],
     },
   ],
-  user: {
-    name: 'Jan M',
-    email: 'jan@thisisrocket.com.au',
-    avatar: '/avatars/shadcn.jpg',
-  },
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  loading = false,
+  error,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  loading?: boolean;
+  error?: string | null;
+}) {
   const pathname = usePathname();
   return (
     <Sidebar {...props}>
@@ -103,7 +106,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarRail />
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {loading ? (
+          <div className='px-4 py-2 text-xs text-muted-foreground'>
+            Loading user...
+          </div>
+        ) : error ? (
+          <div className='px-4 py-2 text-xs text-red-500'>
+            User error: {error}
+          </div>
+        ) : (
+          <NavUser />
+        )}
       </SidebarFooter>
     </Sidebar>
   );
