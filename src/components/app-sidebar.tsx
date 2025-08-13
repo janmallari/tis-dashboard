@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { User } from '@supabase/supabase-js';
 
 // This is sample data.
 const data = {
@@ -57,10 +58,12 @@ const data = {
 };
 
 export function AppSidebar({
+  user,
   loading = false,
   error,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
+  user: User;
   loading?: boolean;
   error?: string | null;
 }) {
@@ -115,7 +118,7 @@ export function AppSidebar({
             User error: {error}
           </div>
         ) : (
-          <NavUser />
+          <NavUser user={user} />
         )}
       </SidebarFooter>
     </Sidebar>

@@ -67,17 +67,15 @@ export default await async function RootAutenticatedLayout({
   }
 
   return (
-    <AuthProvider>
-      <html lang='en'>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>{children}</SidebarInset>
-          </SidebarProvider>
-        </body>
-      </html>
-    </AuthProvider>
+    <html lang='en'>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <SidebarProvider>
+          <AppSidebar user={user} />
+          <SidebarInset>{children}</SidebarInset>
+        </SidebarProvider>
+      </body>
+    </html>
   );
 };

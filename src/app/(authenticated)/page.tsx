@@ -10,7 +10,6 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ReportsTable, Report } from '@/components/reports-table';
-import { useAuth } from '@/hooks/use-auth';
 
 const sampleReports: Report[] = [
   {

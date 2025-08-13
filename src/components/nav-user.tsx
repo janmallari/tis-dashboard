@@ -25,36 +25,19 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/use-auth';
+import { User } from '@supabase/supabase-js';
 
-export function NavUser({
-  user,
-}: {
-  user?: {
-    name: string;
-    email: string;
-    avatar: string;
-  } | null;
-}) {
+export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
-  const { user: contextUser, profile } = useAuth();
 
-  let displayUser: { name: string; email: string; avatar: string } | null =
-    null;
-  if (user && user.name && user.email && user.avatar) {
-    displayUser = user;
-  } else if (profile) {
-    displayUser = {
-      name: profile.full_name || '',
-      email: (profile as any).email || contextUser?.email || '',
-      avatar: profile.avatar_url || '/avatars/default.png',
-    };
-  } else if (contextUser) {
-    displayUser = {
-      name: contextUser.user_metadata?.full_name || contextUser.email || '',
-      email: contextUser.email || '',
-      avatar: '/avatars/default.png',
-    };
-  }
+  let displayUser: { name: string; email: string; avatar: string } = {
+    name: user.user_metadata.fullname,
+    email: user.email!,
+    avatar: user.user_metadata.avatar_url || '',
+  };
+
+  displayUser;
+
   if (!displayUser) return null;
   return (
     <SidebarMenu>
