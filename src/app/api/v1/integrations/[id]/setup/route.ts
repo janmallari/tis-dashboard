@@ -72,9 +72,8 @@ export async function GET(req: NextRequest, context: any) {
         fields: 'id, name',
       });
 
-      return NextResponse.json(
-        { folder: folder.data, message: 'Folder created.' },
-        { status: 201 },
+      return NextResponse.redirect(
+        `${process.env.BASE_URL}/onboarding/storage`,
       );
     } catch (createError) {
       // Trap Google API errors

@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+
   const code = searchParams.get('code');
 
   const oauth2Client = new google.auth.OAuth2(
@@ -38,14 +39,18 @@ export async function GET(request: Request) {
   };
 
   // create new storage_integrations
-  const { data: integrationData, error: integrationError } = await supabase
+  const { data, error: integrationError } = await supabase
     .from('storage_integrations')
-    .insert(newIntegration);
+    .insert(newIntegration)
+    .select('id')
+    .single();
 
   if (integrationError) {
     console.error('Error creating integration:', integrationError);
     return NextResponse.error();
   }
 
-  return NextResponse.redirect(`${process.env.BASE_URL}/onboarding/storage`);
+  return NextResponse.redirect(
+    `${process.env.BASE_URL}/api/v1/integrations/${data.id}/setup`,
+  );
 }
