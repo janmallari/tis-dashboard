@@ -25,7 +25,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { UserProfile } from '@/lib/supabase/client';
 
 // This is sample data.
 const data = {
@@ -66,6 +65,7 @@ export function AppSidebar({
   error?: string | null;
 }) {
   const pathname = usePathname();
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>

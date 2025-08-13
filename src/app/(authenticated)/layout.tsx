@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import '../globals.css';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
-import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { AuthProvider } from '@/hooks/use-auth';
 import { GetUserAgenciesResult } from '@/lib/supabase/client';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';

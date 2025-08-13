@@ -67,10 +67,25 @@ export async function GET(req: NextRequest, context: any) {
         name: folderName,
         mimeType: 'application/vnd.google-apps.folder',
       };
+
       const folder = await drive.files.create({
         requestBody: folderMetadata,
-        fields: 'id, name',
+        fields: 'id, name, webContentLink',
       });
+
+      // update the agency setting to add folder details to json
+      await supabase
+        .from('agencies')
+        .update({
+          settings: {
+            google_drive: {
+              folder_id: folder.data.id,
+              folder_name: folder.data.name,
+              folder_link: folder.data.webContentLink,
+            },
+          },
+        })
+        .eq('id', integration.agency_id);
 
       return NextResponse.redirect(
         `${process.env.BASE_URL}/onboarding/storage`,

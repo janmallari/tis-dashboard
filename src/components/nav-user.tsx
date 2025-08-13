@@ -13,7 +13,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -38,6 +37,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const { user: contextUser, profile } = useAuth();
+
   let displayUser: { name: string; email: string; avatar: string } | null =
     null;
   if (user && user.name && user.email && user.avatar) {

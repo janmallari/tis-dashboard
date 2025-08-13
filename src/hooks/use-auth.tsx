@@ -33,6 +33,7 @@ const AuthenticationContext = createContext<AuthState>({
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [agencies, setAgencies] = useState<GetUserAgenciesResult[]>([]);
@@ -100,7 +101,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           error,
         } = await supabase.auth.getUser();
 
-        if (error) throw error;
+        console.log('FROM FETCH USER', user);
+
+        if (error) {
+          console.error(error);
+          throw error;
+        }
 
         if (mounted) {
           setUser(user);
@@ -166,6 +172,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const isSuper = profile?.user_type === 'super_admin';
+
+  console.log(user);
 
   return (
     <AuthenticationContext.Provider
