@@ -1,6 +1,6 @@
 // src/lib/supabase/client.ts
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/database.types';
+import type { Database, Json } from '@/types/database.types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -50,9 +50,23 @@ export type AgencyWithUsers = Agency & {
 
 // Function return types (for your custom functions)
 export type GetUserAgenciesResult = {
-  agency_id: number;
-  agency_name: string;
-  user_role: AgencyUserRole;
+  id: number;
+  name: string;
+  slug: string;
+  created_by: string;
+  status: Database['public']['Enums']['agency_status'];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  address: string;
+  description: string;
+  phone: string;
+  report_limit: number;
+  settings: Json;
+  website: string;
+  is_unlimited: boolean;
+  user_role: Database['public']['Enums']['agency_user_role'];
+  has_active_integration: boolean;
 };
 
 export type GetAgencyUsersResult = {
@@ -62,3 +76,5 @@ export type GetAgencyUsersResult = {
   role: AgencyUserRole;
   is_active: boolean;
 };
+
+export type StorageIntegrationInsert = TablesInsert<'storage_integrations'>;

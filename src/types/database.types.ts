@@ -323,9 +323,23 @@ export type Database = {
       get_user_agencies: {
         Args: { user_id: string }
         Returns: {
-          agency_id: number
-          agency_name: string
+          id: number
+          name: string
+          slug: string
+          created_by: string
+          status: Database["public"]["Enums"]["agency_status"]
+          is_active: boolean
+          created_at: string
+          updated_at: string
+          address: string
+          description: string
+          phone: string
+          report_limit: number
+          settings: Json
+          website: string
+          is_unlimited: boolean
           user_role: Database["public"]["Enums"]["agency_user_role"]
+          has_active_integration: boolean
         }[]
       }
       is_agency_admin: {

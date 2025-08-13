@@ -4,6 +4,9 @@ import '../globals.css';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { GetUserAgenciesResult } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,6 +28,44 @@ export default await async function RootAutenticatedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+
+  if (!user) {
+    redirect('/auth/sign-in');
+  }
+
+  const fetchUserAgencies = async (
+    userId: string,
+  ): Promise<GetUserAgenciesResult[]> => {
+    try {
+      const { data, error } = await supabase.rpc('get_user_agencies', {
+        user_id: userId,
+      });
+
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error('Error fetching agencies:', err);
+      return [];
+    }
+  };
+
+  const agencies = await fetchUserAgencies(user.id);
+
+  if (agencies.length > 0 && !agencies[0].has_active_integration) {
+    redirect('/onboarding');
+  }
+
   return (
     <AuthProvider>
       <html lang='en'>

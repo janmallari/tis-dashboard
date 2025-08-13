@@ -51,32 +51,6 @@ export async function updateSession(request: NextRequest) {
     return { user, supabaseResponse: NextResponse.redirect(url) };
   }
 
-  // // Access control checker based on user role and path
-  // if (user) {
-  //   console.log('has userr');
-
-  //   const role = user.user_metadata?.role;
-  //   const path = request.nextUrl.pathname;
-
-  //   // Admins: allowed to access '/', but not '/dashboard'
-  //   if (role === 'admin') {
-  //     console.log('has admin role');
-  //     if (path.startsWith('/dashboard')) {
-  //       const url = request.nextUrl.clone();
-  //       url.pathname = '/';
-  //       return NextResponse.redirect(url);
-  //     }
-  //   } else {
-  //     console.log('has non-admin role');
-  //     // Non-admins or undefined role: allowed to access '/dashboard', but not '/'
-  //     if (path === '/' || path === '') {
-  //       const url = request.nextUrl.clone();
-  //       url.pathname = '/dashboard';
-  //       return NextResponse.redirect(url);
-  //     }
-  //   }
-  // }
-
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
   // If you're creating a new response object with NextResponse.next() make sure to:
   // 1. Pass the request in it, like so:

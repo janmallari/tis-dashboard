@@ -45,7 +45,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push('/');
+      router.push('/auth/pre-check');
     } catch (err) {
       console.error('Login error:', err);
       setError('Something went wrong');

@@ -1,9 +1,9 @@
+'use client';
+
 import {
   Breadcrumb,
   BreadcrumbList,
   BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
   BreadcrumbPage,
 } from '@/components/ui/breadcrumb';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,8 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ReportsTable, Report } from '@/components/reports-table';
+import { useAuth } from '@/hooks/use-auth';
+import IntegrationNotice from './components/integrations';
 
 const sampleReports: Report[] = [
   {
@@ -40,6 +42,8 @@ const sampleReports: Report[] = [
 ];
 
 export default function Home() {
+  const { agencies, loading } = useAuth();
+
   return (
     <>
       <header className='flex h-16 shrink-0 items-center gap-2 border-b px-4'>
@@ -57,15 +61,37 @@ export default function Home() {
         </Breadcrumb>
       </header>
       <main className='min-h-screen lg:max-w-7xl bg-white px-8 py-10'>
-        <div className='flex justify-between items-center mb-8'>
-          <div>
-            <h1 className='text-2xl font-bold mb-1'>Dashboard</h1>
-            <p className='text-gray-500 text-base'>Recent generated reports</p>
-          </div>
-          <Button className='bg-black text-white'>Generate New Report</Button>
-        </div>
-        <div className='bg-white rounded-lg border p-0 overflow-x-auto'>
-          <ReportsTable data={sampleReports} />
+        <div className='grid grid-cols-2 gap-4 gap-y-8'>
+          <section className='col-span-2'>
+            <div className='flex justify-between items-center mb-4'>
+              <div>
+                <h2 className='text-2xl font-bold mb-1'>Dashboard</h2>
+                <p className='text-gray-500 text-base'>
+                  Recent generated reports
+                </p>
+              </div>
+              <Button className='bg-black text-white'>
+                Generate New Report
+              </Button>
+            </div>
+            <div className='bg-white rounded-lg border p-0 overflow-x-auto'>
+              <ReportsTable data={sampleReports} />
+            </div>
+          </section>
+
+          {/* <section>
+            <div className='flex justify-between items-center mb-4'>
+              <div>
+                <h2 className='text-2xl font-bold mb-1'>Integrations</h2>
+                <p className='text-gray-500 text-base'>
+                  Your current integration
+                </p>
+              </div>
+            </div>
+            <div className='bg-white rounded-lg border p-6 overflow-x-auto'>
+              <IntegrationNotice agencies={agencies} loading={loading} />
+            </div>
+          </section> */}
         </div>
       </main>
     </>
