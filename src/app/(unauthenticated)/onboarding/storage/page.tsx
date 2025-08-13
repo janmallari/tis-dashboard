@@ -1,6 +1,6 @@
-export default async function OnboardingStoragePage() {
-  console.log('Hello from onboarding storage');
+'use client';
 
+export default function OnboardingStoragePage() {
   return (
     <div>
       <h1>Onboarding Storage</h1>

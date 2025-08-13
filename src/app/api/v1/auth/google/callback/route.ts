@@ -15,16 +15,12 @@ export async function GET(request: Request) {
 
   const { tokens } = await oauth2Client.getToken(code as string);
 
-  console.log(tokens);
-
   const supabase = await createClient();
 
   // get authenticated user
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  console.log(user);
 
   const { data: agencies, error } = await supabase.rpc('get_user_agencies', {
     user_id: user!.id,
@@ -50,8 +46,6 @@ export async function GET(request: Request) {
     console.error('Error creating integration:', integrationError);
     return NextResponse.error();
   }
-
-  console.log('Integration', integrationData);
 
   return NextResponse.redirect(`${process.env.BASE_URL}/onboarding/storage`);
 }
