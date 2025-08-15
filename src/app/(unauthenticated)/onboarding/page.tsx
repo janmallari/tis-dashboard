@@ -51,12 +51,16 @@ export default function OnboardingPage() {
           </Button>
 
           <Button
+            disabled
             onClick={() => handleConnectService('sharepoint')}
-            className='w-full h-12 text-base font-medium bg-blue-800 hover:bg-blue-900'
+            className='mb-1 w-full h-12 text-base font-medium bg-blue-800 hover:bg-blue-900'
             size='lg'
           >
-            Connect SharePoint
+            <span>Connect SharePoint</span>
           </Button>
+          <p className='text-center text-xs text-muted-foreground'>
+            Under maintenance
+          </p>
 
           <p className='text-xs text-muted-foreground text-center'>
             By connecting, you agree to let us access and organize your Google
