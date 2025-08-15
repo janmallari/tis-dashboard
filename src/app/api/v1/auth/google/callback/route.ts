@@ -51,6 +51,6 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.redirect(
-    `${process.env.BASE_URL}/api/v1/integrations/${data.id}/setup`,
+    `${process.env.BASE_URL}/api/v1/integrations/${data.id}/setup/google`,
   );
 }

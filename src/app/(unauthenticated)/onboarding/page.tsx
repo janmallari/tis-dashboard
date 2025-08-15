@@ -11,8 +11,8 @@ import {
 import { CloudIcon, FolderIcon } from 'lucide-react';
 
 export default function OnboardingPage() {
-  const handleConnectGoogleDrive = () => {
-    const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/google`;
+  const handleConnectService = (service: 'google' | 'sharepoint') => {
+    const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/${service}`;
     window.location.href = url;
   };
   return (
@@ -24,7 +24,7 @@ export default function OnboardingPage() {
           </div>
           <CardTitle className='text-2xl font-bold'>Welcome!</CardTitle>
           <CardDescription className='text-base'>
-            Let's get you set up by connecting your Google Drive account
+            Let's get you set up by connecting your storage account
           </CardDescription>
         </CardHeader>
 
@@ -35,24 +35,32 @@ export default function OnboardingPage() {
               <div className='text-sm text-amber-800 dark:text-amber-200'>
                 <p className='font-medium mb-1'>What happens next?</p>
                 <p>
-                  We'll create a few folders in your Google Drive to organize
-                  your files and keep everything tidy.
+                  We'll create a few folders in your preferred storage to
+                  organize your files and keep everything tidy.
                 </p>
               </div>
             </div>
           </div>
 
           <Button
-            onClick={handleConnectGoogleDrive}
-            className='w-full h-12 text-base font-medium'
+            onClick={() => handleConnectService('google')}
+            className='w-full h-12 text-base font-medium bg-blue-600 hover:bg-blue-700'
             size='lg'
           >
             Connect Google Drive
           </Button>
 
+          <Button
+            onClick={() => handleConnectService('sharepoint')}
+            className='w-full h-12 text-base font-medium bg-blue-800 hover:bg-blue-900'
+            size='lg'
+          >
+            Connect SharePoint
+          </Button>
+
           <p className='text-xs text-muted-foreground text-center'>
             By connecting, you agree to let us access and organize your Google
-            Drive files
+            Drive/Sharepoint files
           </p>
         </CardContent>
       </Card>

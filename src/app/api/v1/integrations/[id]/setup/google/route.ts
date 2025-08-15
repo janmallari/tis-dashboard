@@ -12,6 +12,26 @@ export async function GET(req: NextRequest, context: any) {
   try {
     // Fetch integration from DB
     const supabase = await createClient();
+
+    // get authenticated user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { data: agencies, error: getUserAgenciesError } = await supabase.rpc(
+      'get_user_agencies',
+      {
+        user_id: user!.id,
+      },
+    );
+
+    if (getUserAgenciesError) {
+      console.error('Error fetching user agencies:', getUserAgenciesError);
+      return NextResponse.error();
+    }
+
+    const agency = agencies[0];
+
     const { data: integration, error } = await supabase
       .from('storage_integrations')
       .select('id, access_token, agency_id')
@@ -78,6 +98,7 @@ export async function GET(req: NextRequest, context: any) {
         .from('agencies')
         .update({
           settings: {
+            ...agency.settings,
             google_drive: {
               folder_id: folder.data.id,
               folder_name: folder.data.name,
