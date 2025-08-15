@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
 export async function GET(request: Request) {
+  console.log(process.env);
   const params = new URLSearchParams({
     client_id: process.env.SHAREPOINT_CLIENT_ID!,
     response_type: 'code',
-    redirect_uri: process.env.SHAREPOINT_REDIRECT_URI ?? '',
+    redirect_uri: process.env.SHAREPOINT_REDIRECT_URI!,
     response_mode: 'query',
     scope: 'offline_access Files.ReadWrite Sites.ReadWrite.All',
   });
