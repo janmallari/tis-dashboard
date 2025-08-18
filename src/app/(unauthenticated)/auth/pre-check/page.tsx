@@ -44,6 +44,10 @@ export default async function PreCheck() {
     redirect('/onboarding');
   }
 
+  if (agencies.length > 0 && agencies[0].has_active_integration) {
+    redirect('/');
+  }
+
   return (
     <p>Hello, {user?.user_metadata?.full_name}! Doing some pre-checks...</p>
   );

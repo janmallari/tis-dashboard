@@ -28,6 +28,26 @@ export type AgencyUser = Tables<'agency_users'>;
 export type StorageIntegration = Tables<'storage_integrations'>;
 export type AgencyInvitationLog = Tables<'agency_invitation_logs'>;
 
+// Client type (manual definition until database types are regenerated)
+export type Client = {
+  id: number;
+  name: string;
+  media_plan_template?: string;
+  media_plan_results_template?: string;
+  slides_template?: string;
+  agency_id: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ClientInsert = {
+  name: string;
+  media_plan_template?: string;
+  media_plan_results_template?: string;
+  slides_template?: string;
+  agency_id: number;
+};
+
 // Export enum types
 export type UserType = Enums<'user_type'>;
 export type AgencyStatus = Enums<'agency_status'>;
