@@ -52,7 +52,7 @@ const columns: ColumnDef<Client>[] = [
     },
   },
   {
-    accessorKey: 'mediaResults',
+    accessorKey: 'mediaResultsa',
     header: 'Media Results Template',
     cell: (info) => {
       const value = info.getValue() as { text: string; className?: string };

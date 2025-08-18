@@ -91,9 +91,18 @@ export async function POST(req: NextRequest) {
       reports: null as string | null,
     };
     let uploadedFiles = {
-      media_plan_template: null as string | null,
-      media_plan_results_template: null as string | null,
-      slides_template: null as string | null,
+      media_plan_template: {
+        id: null as string | null,
+        url: null as string | null,
+      },
+      media_plan_results_template: {
+        id: null as string | null,
+        url: null as string | null,
+      },
+      slides_template: {
+        id: null as string | null,
+        url: null as string | null,
+      },
     };
 
     try {
@@ -154,36 +163,36 @@ export async function POST(req: NextRequest) {
         // Upload template files to the templates folder
         if (folderStructure.templates) {
           if (mediaPlanTemplateFile && mediaPlanTemplateFile.size > 0) {
-            const uploadedFileId = await uploadFileToGoogleDrive(
+            const result = await uploadFileToGoogleDrive(
               integration.access_token,
               mediaPlanTemplateFile,
               folderStructure.templates,
               'Media Plan Template',
             );
-            uploadedFiles.media_plan_template = uploadedFileId;
+            uploadedFiles.media_plan_template = result;
           }
 
           if (
             mediaPlanResultsTemplateFile &&
             mediaPlanResultsTemplateFile.size > 0
           ) {
-            const uploadedFileId = await uploadFileToGoogleDrive(
+            const result = await uploadFileToGoogleDrive(
               integration.access_token,
               mediaPlanResultsTemplateFile,
               folderStructure.templates,
               'Media Plan Results Template',
             );
-            uploadedFiles.media_plan_results_template = uploadedFileId;
+            uploadedFiles.media_plan_results_template = result;
           }
 
           if (slidesTemplateFile && slidesTemplateFile.size > 0) {
-            const uploadedFileId = await uploadFileToGoogleDrive(
+            const result = await uploadFileToGoogleDrive(
               integration.access_token,
               slidesTemplateFile,
               folderStructure.templates,
               'Slides Template',
             );
-            uploadedFiles.slides_template = uploadedFileId;
+            uploadedFiles.slides_template = result;
           }
         }
       } else if (storageProvider === 'sharepoint') {
@@ -250,7 +259,7 @@ export async function POST(req: NextRequest) {
         )}/templates`;
 
         if (mediaPlanTemplateFile && mediaPlanTemplateFile.size > 0) {
-          const uploadedFileId = await uploadFileToSharePoint(
+          const result = await uploadFileToSharePoint(
             integration.access_token,
             mediaPlanTemplateFile,
             siteId,
@@ -258,14 +267,14 @@ export async function POST(req: NextRequest) {
             templatesPath,
             'Media Plan Template',
           );
-          uploadedFiles.media_plan_template = uploadedFileId;
+          uploadedFiles.media_plan_template = result;
         }
 
         if (
           mediaPlanResultsTemplateFile &&
           mediaPlanResultsTemplateFile.size > 0
         ) {
-          const uploadedFileId = await uploadFileToSharePoint(
+          const result = await uploadFileToSharePoint(
             integration.access_token,
             mediaPlanResultsTemplateFile,
             siteId,
@@ -273,11 +282,11 @@ export async function POST(req: NextRequest) {
             templatesPath,
             'Media Plan Results Template',
           );
-          uploadedFiles.media_plan_results_template = uploadedFileId;
+          uploadedFiles.media_plan_results_template = result;
         }
 
         if (slidesTemplateFile && slidesTemplateFile.size > 0) {
-          const uploadedFileId = await uploadFileToSharePoint(
+          const result = await uploadFileToSharePoint(
             integration.access_token,
             slidesTemplateFile,
             siteId,
@@ -285,7 +294,7 @@ export async function POST(req: NextRequest) {
             templatesPath,
             'Slides Template',
           );
-          uploadedFiles.slides_template = uploadedFileId;
+          uploadedFiles.slides_template = result;
         }
       }
     } catch (error) {
@@ -293,14 +302,19 @@ export async function POST(req: NextRequest) {
       // Continue without folder creation - user can manually organize files
     }
 
-    // Create client record in database
+    // Create client record in database with both IDs and URLs
     const { data: client, error: clientError } = await supabase
       .from('clients')
       .insert({
         name,
-        media_plan_template: uploadedFiles.media_plan_template,
-        media_plan_results_template: uploadedFiles.media_plan_results_template,
-        slides_template: uploadedFiles.slides_template,
+        media_plan_template: uploadedFiles.media_plan_template.url,
+        media_plan_template_id: uploadedFiles.media_plan_template.id,
+        media_plan_results_template:
+          uploadedFiles.media_plan_results_template.url,
+        media_plan_results_template_id:
+          uploadedFiles.media_plan_results_template.id,
+        slides_template: uploadedFiles.slides_template.url,
+        slides_template_id: uploadedFiles.slides_template.id,
         agency_id: agency.id,
       })
       .select('*')
@@ -338,7 +352,7 @@ async function uploadFileToGoogleDrive(
   file: File,
   folderId: string,
   fileName: string,
-): Promise<string | null> {
+): Promise<{ id: string | null; url: string | null }> {
   try {
     // First, create the file metadata
     const metadata = {
@@ -369,14 +383,17 @@ async function uploadFileToGoogleDrive(
         'Failed to upload file to Google Drive:',
         await response.text(),
       );
-      return null;
+      return { id: null, url: null };
     }
 
     const result = await response.json();
-    return result.id;
+    return {
+      id: result.id,
+      url: `https://drive.google.com/file/d/${result.id}/view`,
+    };
   } catch (error) {
     console.error('Error uploading file to Google Drive:', error);
-    return null;
+    return { id: null, url: null };
   }
 }
 
@@ -388,7 +405,7 @@ async function uploadFileToSharePoint(
   driveId: string,
   folderPath: string,
   fileName: string,
-): Promise<string | null> {
+): Promise<{ id: string | null; url: string | null }> {
   try {
     const fileExtension = file.name.split('.').pop();
     const fullFileName = `${fileName}.${fileExtension}`;
@@ -414,14 +431,17 @@ async function uploadFileToSharePoint(
         'Failed to upload file to SharePoint:',
         await response.text(),
       );
-      return null;
+      return { id: null, url: null };
     }
 
     const result = await response.json();
-    return result.id;
+    return {
+      id: result.id,
+      url: result.webUrl,
+    };
   } catch (error) {
     console.error('Error uploading file to SharePoint:', error);
-    return null;
+    return { id: null, url: null };
   }
 }
 

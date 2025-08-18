@@ -3,14 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Plus, ExternalLink, Folder } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Plus, MoreHorizontal, Folder, ExternalLink } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -19,14 +13,42 @@ import {
 } from '@/components/ui/breadcrumb';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@radix-ui/react-separator';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  flexRender,
+  type ColumnDef,
+  type SortingState,
+  type ColumnFiltersState,
+} from '@tanstack/react-table';
 
 interface Client {
   id: number;
   name: string;
   media_plan_template?: string;
+  media_plan_template_id?: string;
   media_plan_results_template?: string;
+  media_plan_results_template_id?: string;
   slides_template?: string;
+  slides_template_id?: string;
   created_at: string;
   updated_at: string;
 }
@@ -36,6 +58,8 @@ export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   useEffect(() => {
     fetchClients();
@@ -62,17 +86,132 @@ export default function ClientsPage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+  const getTemplateStatus = (templateUrl?: string, templateId?: string) => {
+    if (templateUrl && templateId) {
+      return (
+        <div className='flex items-center gap-2'>
+          <Badge
+            variant='secondary'
+            className='bg-green-100 text-green-800 hover:bg-green-100'
+          >
+            Uploaded
+          </Badge>
+          <Button variant='ghost' size='sm' asChild className='h-6 w-6 p-0'>
+            <a
+              href={templateUrl}
+              target='_blank'
+              rel='noopener noreferrer'
+              title='Open file'
+            >
+              <ExternalLink className='h-3 w-3' />
+            </a>
+          </Button>
+        </div>
+      );
+    }
+    return (
+      <Badge
+        variant='secondary'
+        className='bg-gray-100 text-gray-800 hover:bg-gray-100'
+      >
+        Pending
+      </Badge>
+    );
   };
+
+  const columns: ColumnDef<Client>[] = [
+    {
+      accessorKey: 'name',
+      header: 'Client',
+      cell: ({ row }) => {
+        return <div className='font-medium'>{row.getValue('name')}</div>;
+      },
+    },
+    {
+      id: 'reports_generated',
+      header: 'Reports Generated',
+      cell: () => {
+        // This would come from your reports API - placeholder for now
+        return <div className='text-sm'>0</div>;
+      },
+    },
+    {
+      accessorKey: 'media_plan_template',
+      header: 'Media Plan Template',
+      cell: ({ row }) => {
+        return getTemplateStatus(
+          row.getValue('media_plan_template'),
+          row.original.media_plan_template_id,
+        );
+      },
+    },
+    {
+      accessorKey: 'media_plan_results_template',
+      header: 'Media Results Template',
+      cell: ({ row }) => {
+        return getTemplateStatus(
+          row.getValue('media_plan_results_template'),
+          row.original.media_plan_results_template_id,
+        );
+      },
+    },
+    {
+      accessorKey: 'slides_template',
+      header: 'Slides Template',
+      cell: ({ row }) => {
+        return getTemplateStatus(
+          row.getValue('slides_template'),
+          row.original.slides_template_id,
+        );
+      },
+    },
+    {
+      id: 'actions',
+      header: '',
+      cell: ({ row }) => {
+        const client = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <MoreHorizontal className='h-4 w-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem
+                onClick={() => router.push(`/clients/${client.id}`)}
+              >
+                View details
+              </DropdownMenuItem>
+              <DropdownMenuItem className='text-red-600'>
+                Delete client
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
+  const table = useReactTable({
+    data: clients,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      sorting,
+      columnFilters,
+    },
+  });
 
   if (loading) {
     return (
-      <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center'>
+      <div className='min-h-screen  flex items-center justify-center'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4'></div>
           <p className='text-gray-600 dark:text-gray-400'>Loading clients...</p>
@@ -97,21 +236,23 @@ export default function ClientsPage() {
           </BreadcrumbList>
         </Breadcrumb>
       </header>
-      <main className='min-h-screen lg:max-w-7xl bg-white px-8 py-10'>
+
+      <main className='lg:max-w-7xl bg-white px-8 pt-10'>
         <div className='grid grid-cols-2 gap-4 gap-y-8'>
           <section className='col-span-2'>
             <div className='flex justify-between items-center mb-4'>
               <div>
                 <h2 className='text-2xl font-bold mb-1'>Clients</h2>
                 <p className='text-gray-500 text-base'>
-                  Manage your agency's clients and their templates
+                  Manage your clients data and upload templates
                 </p>
               </div>
               <Button className='bg-black text-white' asChild>
                 <Link href={'/clients/new'}>Add New Client</Link>
               </Button>
             </div>
-            <div className='bg-white rounded-lg border p-0 overflow-x-auto'>
+
+            <div className='bg-white rounded-lg border overflow-hidden'>
               {error && (
                 <Card className='mb-6'>
                   <CardContent className='pt-6'>
@@ -151,105 +292,61 @@ export default function ClientsPage() {
                 </Card>
               )}
 
+              {/* Table */}
               {clients.length > 0 && (
-                <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-                  {clients.map((client) => (
-                    <Card
-                      key={client.id}
-                      className='hover:shadow-lg transition-shadow'
-                    >
-                      <CardHeader>
-                        <CardTitle className='flex items-center justify-between'>
-                          <span>{client.name}</span>
-                        </CardTitle>
-                        <CardDescription>
-                          Created {formatDate(client.created_at)}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className='space-y-3'>
-                          {/* Template Links */}
-                          {client.media_plan_template && (
-                            <div className='flex items-center justify-between'>
-                              <span className='text-sm text-gray-600 dark:text-gray-400'>
-                                Media Plan Template
-                              </span>
-                              <Button
-                                variant='ghost'
-                                size='sm'
-                                onClick={() =>
-                                  window.open(
-                                    client.media_plan_template,
-                                    '_blank',
-                                  )
-                                }
-                              >
-                                <ExternalLink className='w-3 h-3' />
-                              </Button>
-                            </div>
-                          )}
-
-                          {client.media_plan_results_template && (
-                            <div className='flex items-center justify-between'>
-                              <span className='text-sm text-gray-600 dark:text-gray-400'>
-                                Results Template
-                              </span>
-                              <Button
-                                variant='ghost'
-                                size='sm'
-                                onClick={() =>
-                                  window.open(
-                                    client.media_plan_results_template,
-                                    '_blank',
-                                  )
-                                }
-                              >
-                                <ExternalLink className='w-3 h-3' />
-                              </Button>
-                            </div>
-                          )}
-
-                          {client.slides_template && (
-                            <div className='flex items-center justify-between'>
-                              <span className='text-sm text-gray-600 dark:text-gray-400'>
-                                Slides Template
-                              </span>
-                              <Button
-                                variant='ghost'
-                                size='sm'
-                                onClick={() =>
-                                  window.open(client.slides_template, '_blank')
-                                }
-                              >
-                                <ExternalLink className='w-3 h-3' />
-                              </Button>
-                            </div>
-                          )}
-
-                          {/* No templates message */}
-                          {!client.media_plan_template &&
-                            !client.media_plan_results_template &&
-                            !client.slides_template && (
-                              <p className='text-sm text-gray-500 italic'>
-                                No template files configured
-                              </p>
-                            )}
-                        </div>
-
-                        <div className='mt-4 pt-4 border-t'>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            className='w-full'
-                            onClick={() => router.push(`/clients/${client.id}`)}
+                <Table>
+                  <TableHeader>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <TableRow
+                        key={headerGroup.id}
+                        className='border-b bg-gray-50/50'
+                      >
+                        {headerGroup.headers.map((header) => (
+                          <TableHead
+                            key={header.id}
+                            className='font-medium text-gray-700'
                           >
-                            View Details
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableHeader>
+                  <TableBody>
+                    {table.getRowModel().rows?.length ? (
+                      table.getRowModel().rows.map((row) => (
+                        <TableRow
+                          key={row.id}
+                          data-state={row.getIsSelected() && 'selected'}
+                          className='hover:bg-gray-50/50'
+                        >
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id} className='py-4'>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={columns.length}
+                          className='h-24 text-center'
+                        >
+                          No results.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
               )}
             </div>
           </section>
