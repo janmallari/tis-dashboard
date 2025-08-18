@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronRight, Upload, X } from 'lucide-react';
+import { ChevronRight, Upload, X, ExternalLink } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -30,6 +30,7 @@ interface Client {
   created_at: string;
   updated_at: string;
 }
+
 export default function EditClientPage() {
   const router = useRouter();
   const params = useParams();
@@ -90,6 +91,22 @@ export default function EditClientPage() {
   const validateFileType = (file: File, allowedTypes: string[]): boolean => {
     const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
     return allowedTypes.includes(fileExtension);
+  };
+
+  // Helper function to get existing file URL based on field
+  const getExistingFileUrl = (field: keyof typeof files) => {
+    if (!client) return null;
+
+    switch (field) {
+      case 'media_plan_template':
+        return client.media_plan_template;
+      case 'media_plan_results_template':
+        return client.media_plan_results_template;
+      case 'slides_template':
+        return client.slides_template;
+      default:
+        return null;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -185,6 +202,7 @@ export default function EditClientPage() {
     hasExistingFile?: boolean;
   }) => {
     const file = files[field];
+    const existingFileUrl = getExistingFileUrl(field);
 
     const handleDivClick = () => {
       if (!file && !disabled) {
@@ -231,9 +249,20 @@ export default function EditClientPage() {
     return (
       <div className='space-y-2'>
         <Label htmlFor={field}>{label}</Label>
-        {hasExistingFile && !file && (
-          <div className='text-sm text-green-600 mb-2'>
-            ✓ File already uploaded. Upload a new file to replace it.
+        {hasExistingFile && !file && existingFileUrl && (
+          <div className='text-sm mb-2'>
+            <a
+              href={existingFileUrl}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline'
+            >
+              {label}
+              <ExternalLink className='h-3 w-3' />
+            </a>
+            <span className='text-gray-500 ml-2'>
+              - Upload a new file to replace it
+            </span>
           </div>
         )}
         <div
@@ -432,6 +461,31 @@ export default function EditClientPage() {
                 </Button>
               </div>
             </form>
+
+            {/* Info Card */}
+            <Card className='mt-6 lg:max-w-2xl'>
+              <CardHeader>
+                <CardTitle className='text-base'>
+                  File Update Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className='text-sm text-gray-600'>
+                <ul className='space-y-2'>
+                  <li>• Only upload files that you want to replace</li>
+                  <li>
+                    • Existing files will be automatically deleted when replaced
+                  </li>
+                  <li>
+                    • If no new file is uploaded, the existing file will remain
+                    unchanged
+                  </li>
+                  <li>
+                    • Accepted formats: CSV for templates, PPTX for slides
+                  </li>
+                  <li>• Maximum file size: 10MB per file</li>
+                </ul>
+              </CardContent>
+            </Card>
           </section>
         </div>
       </main>

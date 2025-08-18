@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function GET(req: NextRequest, context: any) {
   try {
     const supabase = await createClient();
 
@@ -35,11 +32,14 @@ export async function GET(
 
     const agency = agencies[0];
 
+    const params = await context.params;
+    const clientId = params.id;
+
     // Get client by ID
     const { data: client, error: clientError } = await supabase
       .from('clients')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', clientId)
       .eq('agency_id', agency.id)
       .single();
 
