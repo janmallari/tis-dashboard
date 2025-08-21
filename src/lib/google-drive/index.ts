@@ -123,3 +123,31 @@ export async function ensureValidGoogleDriveToken(
 
   return null;
 }
+
+export async function getJsonFromSlides(
+  accessToken: string,
+  fileId: string,
+): Promise<any> {
+  try {
+    const response = await fetch(
+      `https://slides.googleapis.com/v1/presentations/${fileId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch slides: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching slides:', error);
+    throw error;
+  }
+}

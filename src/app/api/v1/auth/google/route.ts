@@ -11,7 +11,10 @@ export async function GET(request: Request) {
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline', // get refresh token
     prompt: 'consent',
-    scope: ['https://www.googleapis.com/auth/drive.file'],
+    scope: [
+      'https://www.googleapis.com/auth/drive.file',
+      'https://www.googleapis.com/auth/presentations.readonly',
+    ],
   });
 
   return NextResponse.redirect(authUrl);

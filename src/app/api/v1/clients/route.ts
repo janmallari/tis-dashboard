@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getJsonFromSlides } from '@/lib/google-drive';
 
 export async function POST(req: NextRequest) {
   try {
@@ -103,6 +104,10 @@ export async function POST(req: NextRequest) {
         id: null as string | null,
         url: null as string | null,
       },
+      slides_json: {
+        id: null as string | null,
+        url: null as string | null,
+      },
     };
 
     try {
@@ -191,8 +196,31 @@ export async function POST(req: NextRequest) {
               slidesTemplateFile,
               folderStructure.templates,
               'Slides Template',
+              'application/vnd.google-apps.presentation',
             );
+
             uploadedFiles.slides_template = result;
+
+            // we then need to extract shapes and such from the slides
+            const slidesJson = await getJsonFromSlides(
+              integration.access_token,
+              result.id!,
+            );
+
+            // upload slidesJson as json file in google drive, use uploadFileToGoogleDrive function
+            const slidesJsonBlob = new Blob([JSON.stringify(slidesJson)], {
+              type: 'application/json',
+            });
+            const slidesJsonFile = new File([slidesJsonBlob], 'slides.json');
+
+            const uploadedJson = await uploadFileToGoogleDrive(
+              integration.access_token,
+              slidesJsonFile,
+              folderStructure.templates,
+              'Slides JSON',
+            );
+
+            uploadedFiles.slides_json = uploadedJson;
           }
         }
       } else if (storageProvider === 'sharepoint') {
@@ -315,6 +343,8 @@ export async function POST(req: NextRequest) {
           uploadedFiles.media_plan_results_template.id,
         slides_template: uploadedFiles.slides_template.url,
         slides_template_id: uploadedFiles.slides_template.id,
+        slides_template_json: uploadedFiles.slides_json.url,
+        slides_template_json_id: uploadedFiles.slides_json.id,
         agency_id: agency.id,
       })
       .select('*')
@@ -352,13 +382,18 @@ async function uploadFileToGoogleDrive(
   file: File,
   folderId: string,
   fileName: string,
+  mimeType?: string | null,
 ): Promise<{ id: string | null; url: string | null }> {
   try {
     // First, create the file metadata
-    const metadata = {
+    const metadata: { name: string; parents: string[]; mimeType?: string } = {
       name: fileName + '.' + file.name.split('.').pop(),
       parents: [folderId],
     };
+
+    if (mimeType) {
+      metadata.mimeType = mimeType;
+    }
 
     const form = new FormData();
     form.append(
