@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getJsonFromSlides } from '@/lib/google-drive';
+import {
+  ensureValidGoogleDriveToken,
+  getJsonFromSlides,
+} from '@/lib/google-drive';
 
 export async function POST(req: NextRequest) {
   try {
@@ -109,9 +112,36 @@ export async function POST(req: NextRequest) {
         url: null as string | null,
       },
     };
+    let accessToken = integration.access_token;
 
     try {
       if (storageProvider === 'google_drive') {
+        const tokenResult = await ensureValidGoogleDriveToken(
+          integration.access_token,
+          integration.refresh_token,
+        );
+
+        if (!tokenResult) {
+          return NextResponse.json(
+            {
+              error:
+                'Failed to authenticate with Google Drive. Please reconnect your storage integration.',
+            },
+            { status: 401 },
+          );
+        }
+
+        accessToken = tokenResult.token;
+
+        // Update the database if token was refreshed
+        if (tokenResult.wasRefreshed) {
+          console.log('Updating database with new access token...');
+          await supabase
+            .from('storage_integrations')
+            .update({ access_token: accessToken })
+            .eq('id', integration.id);
+        }
+
         // Create main client folder
         const folderResponse = await fetch(
           'https://www.googleapis.com/drive/v3/files',
@@ -147,7 +177,7 @@ export async function POST(req: NextRequest) {
             {
               method: 'POST',
               headers: {
-                Authorization: `Bearer ${integration.access_token}`,
+                Authorization: `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
@@ -169,7 +199,7 @@ export async function POST(req: NextRequest) {
         if (folderStructure.templates) {
           if (mediaPlanTemplateFile && mediaPlanTemplateFile.size > 0) {
             const result = await uploadFileToGoogleDrive(
-              integration.access_token,
+              accessToken,
               mediaPlanTemplateFile,
               folderStructure.templates,
               'Media Plan Template',
@@ -182,7 +212,7 @@ export async function POST(req: NextRequest) {
             mediaPlanResultsTemplateFile.size > 0
           ) {
             const result = await uploadFileToGoogleDrive(
-              integration.access_token,
+              accessToken,
               mediaPlanResultsTemplateFile,
               folderStructure.templates,
               'Media Plan Results Template',
@@ -192,7 +222,7 @@ export async function POST(req: NextRequest) {
 
           if (slidesTemplateFile && slidesTemplateFile.size > 0) {
             const result = await uploadFileToGoogleDrive(
-              integration.access_token,
+              accessToken,
               slidesTemplateFile,
               folderStructure.templates,
               'Slides Template',
@@ -202,10 +232,7 @@ export async function POST(req: NextRequest) {
             uploadedFiles.slides_template = result;
 
             // we then need to extract shapes and such from the slides
-            const slidesJson = await getJsonFromSlides(
-              integration.access_token,
-              result.id!,
-            );
+            const slidesJson = await getJsonFromSlides(accessToken, result.id!);
 
             // upload slidesJson as json file in google drive, use uploadFileToGoogleDrive function
             const slidesJsonBlob = new Blob([JSON.stringify(slidesJson)], {
@@ -214,7 +241,7 @@ export async function POST(req: NextRequest) {
             const slidesJsonFile = new File([slidesJsonBlob], 'slides.json');
 
             const uploadedJson = await uploadFileToGoogleDrive(
-              integration.access_token,
+              accessToken,
               slidesJsonFile,
               folderStructure.templates,
               'Slides JSON',

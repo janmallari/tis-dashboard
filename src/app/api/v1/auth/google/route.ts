@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     prompt: 'consent',
     scope: [
       'https://www.googleapis.com/auth/drive.file',
-      'https://www.googleapis.com/auth/presentations.readonly',
+      'https://www.googleapis.com/auth/presentations',
     ],
   });
 

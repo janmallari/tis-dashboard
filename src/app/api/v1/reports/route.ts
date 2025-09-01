@@ -368,6 +368,10 @@ export async function POST(req: NextRequest) {
           url: client.slides_template,
           file_id: client.slides_template_id,
         },
+        slides_template_json: {
+          url: client.slides_template_json,
+          file_id: client.slides_template_json_id,
+        },
       },
       storage: {
         provider: storageProvider,
@@ -378,25 +382,14 @@ export async function POST(req: NextRequest) {
     };
 
     // Send webhook to N8N
-    try {
-      const webhookResponse = await fetch(process.env.N8N_WEBHOOK_URL!, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': process.env.N8N_API_KEY!,
-        },
-        body: JSON.stringify(webhookPayload),
-      });
-
-      if (!webhookResponse.ok) {
-        console.error('N8N webhook failed:', await webhookResponse.text());
-        // Don't fail the request, just log the error
-        // The report is still created and can be manually processed
-      }
-    } catch (webhookError) {
-      console.error('Error calling N8N webhook:', webhookError);
-      // Don't fail the request, just log the error
-    }
+    fetch(process.env.N8N_WEBHOOK_URL!, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': process.env.N8N_API_KEY!,
+      },
+      body: JSON.stringify(webhookPayload),
+    });
 
     return NextResponse.json({
       success: true,

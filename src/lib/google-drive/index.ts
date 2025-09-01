@@ -22,7 +22,7 @@ export async function refreshGoogleDriveToken(
       };
     }
 
-    console.log('Attempting to refresh Google Drive token...');
+    console.log('Attempting to refresh Google Drive token...', refreshToken);
 
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
@@ -83,7 +83,7 @@ export async function validateGoogleDriveToken(
       console.log('Token is valid for user:', data.user?.emailAddress);
       return true;
     } else {
-      console.log('Token validation failed:', response.status);
+      console.log('Token validation failed:', await response.json());
       return false;
     }
   } catch (error) {
