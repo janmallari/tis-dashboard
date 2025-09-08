@@ -14,6 +14,7 @@ export async function GET(request: Request) {
     scope: [
       'https://www.googleapis.com/auth/drive.file',
       'https://www.googleapis.com/auth/presentations',
+      'https://www.googleapis.com/auth/spreadsheets',
     ],
   });
 
