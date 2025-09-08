@@ -24,7 +24,7 @@ export default function OnboardingPage() {
           </div>
           <CardTitle className='text-2xl font-bold'>Welcome!</CardTitle>
           <CardDescription className='text-base'>
-            Let's get you set up by connecting your storage account
+            Let&apos;s get you set up by connecting your storage account
           </CardDescription>
         </CardHeader>
 
@@ -35,7 +35,7 @@ export default function OnboardingPage() {
               <div className='text-sm text-amber-800 dark:text-amber-200'>
                 <p className='font-medium mb-1'>What happens next?</p>
                 <p>
-                  We'll create a few folders in your preferred storage to
+                  We&apos;ll create a few folders in your preferred storage to
                   organize your files and keep everything tidy.
                 </p>
               </div>

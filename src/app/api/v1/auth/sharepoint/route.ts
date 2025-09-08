@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { google } from 'googleapis';
 
-export async function GET(request: Request) {
+export async function GET() {
   const params = new URLSearchParams({
     client_id: process.env.SHAREPOINT_CLIENT_ID!,
     response_type: 'code',

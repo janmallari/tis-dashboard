@@ -223,7 +223,7 @@ export async function POST(req: NextRequest) {
     const mediaResultsFilename = `${timestamp}.media_plan_results.csv`;
 
     // Upload files to storage
-    let uploadedFiles = {
+    const uploadedFiles = {
       media_plan: { id: null as string | null, url: null as string | null },
       media_results: { id: null as string | null, url: null as string | null },
     };

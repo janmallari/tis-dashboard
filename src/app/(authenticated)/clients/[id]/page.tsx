@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,11 +49,7 @@ export default function EditClientPage() {
     slides_template: null as File | null,
   });
 
-  useEffect(() => {
-    fetchClient();
-  }, [clientId]);
-
-  const fetchClient = async () => {
+  const fetchClient = useCallback(async () => {
     try {
       const response = await fetch(`/api/v1/clients/${clientId}`);
 
@@ -74,7 +70,11 @@ export default function EditClientPage() {
     } finally {
       setFetchLoading(false);
     }
-  };
+  }, [clientId, router]);
+
+  useEffect(() => {
+    fetchClient();
+  }, [fetchClient]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

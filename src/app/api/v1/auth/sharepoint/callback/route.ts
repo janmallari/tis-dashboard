@@ -5,7 +5,6 @@ import { StorageIntegrationInsert } from '@/lib/supabase/client';
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
-  const state = searchParams.get('state');
 
   if (!code) {
     return NextResponse.json({ error: 'Missing code param' }, { status: 400 });
@@ -44,7 +43,7 @@ export async function GET(req: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { data: agencies, error } = await supabase.rpc('get_user_agencies', {
+    const { data: agencies } = await supabase.rpc('get_user_agencies', {
       user_id: user!.id,
     });
 
@@ -60,7 +59,7 @@ export async function GET(req: NextRequest) {
     };
 
     // create new storage_integrations
-    const { data, error: integrationError } = await supabase
+    const { error: integrationError } = await supabase
       .from('storage_integrations')
       .insert(newIntegration)
       .select('id')

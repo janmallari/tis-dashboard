@@ -39,7 +39,7 @@ export default function ConnectedPage() {
               <div className='text-sm text-green-800 dark:text-green-200'>
                 <p className='font-medium mb-1'>Folders Created</p>
                 <p>
-                  We've successfully created the necessary folders in your
+                  We&apos;ve successfully created the necessary folders in your
                   Google Drive to keep your files organized.
                 </p>
               </div>

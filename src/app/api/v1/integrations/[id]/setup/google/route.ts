@@ -57,9 +57,6 @@ export async function GET(req: NextRequest, context: any) {
 
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
-    // Check if folder already exists
-    let folderId = null;
-
     const folderName = `tis-${integration.agency_id}_${integration.id}`;
 
     try {
@@ -69,7 +66,7 @@ export async function GET(req: NextRequest, context: any) {
       });
 
       if (listRes.data.files && listRes.data.files.length > 0) {
-        folderId = listRes.data.files[0].id;
+        // folderId = listRes.data.files[0].id;
 
         return NextResponse.json(
           { folder: listRes.data.files[0], message: 'Folder already exists.' },

@@ -7,7 +7,6 @@ import {
   type GetUserAgenciesResult,
 } from '@/lib/supabase/client';
 import type { User as AuthUser } from '@supabase/supabase-js';
-import { useRouter } from 'next/navigation';
 
 type AuthState = {
   user: AuthUser | null;
@@ -32,8 +31,6 @@ const AuthenticationContext = createContext<AuthState>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [agencies, setAgencies] = useState<GetUserAgenciesResult[]>([]);

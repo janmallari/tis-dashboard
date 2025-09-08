@@ -58,10 +58,8 @@ export async function GET(req: NextRequest, context: any) {
   }
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function PUT(req: NextRequest, context: any) {
+  const params = await context.params;
   try {
     const supabase = await createClient();
 
@@ -146,7 +144,7 @@ export async function PUT(
     const storageProvider = integration?.provider;
 
     // Handle file updates
-    let updatedFiles = {
+    const updatedFiles = {
       media_plan_template: {
         id: existingClient.media_plan_template_id,
         url: existingClient.media_plan_template,

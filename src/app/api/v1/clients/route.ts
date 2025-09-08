@@ -89,12 +89,12 @@ export async function POST(req: NextRequest) {
     // Create client folder structure and upload files
     let clientFolderId = null;
     let clientFolderUrl = null;
-    let folderStructure = {
+    const folderStructure = {
       templates: null as string | null,
       data: null as string | null,
       reports: null as string | null,
     };
-    let uploadedFiles = {
+    const uploadedFiles = {
       media_plan_template: {
         id: null as string | null,
         url: null as string | null,
@@ -507,7 +507,7 @@ async function uploadFileToSharePoint(
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 

@@ -120,8 +120,6 @@ function SetPasswordForm() {
       }
       setSuccess('Password set successfully! Redirecting to dashboard...');
       setTimeout(() => router.push('/'), 2000);
-
-      // eslint-disable-next-line
     } catch (err: any) {
       setError(err.message || 'Failed to set password');
     } finally {

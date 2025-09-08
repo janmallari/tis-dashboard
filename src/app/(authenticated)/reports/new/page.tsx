@@ -392,7 +392,7 @@ export default function NewReportPage() {
                   <li>
                     • A PowerPoint presentation will be generated automatically
                   </li>
-                  <li>• You'll be notified when the report is ready</li>
+                  <li>• You&apos;ll be notified when the report is ready</li>
                   <li>• Processing typically takes 2-5 minutes</li>
                 </ul>
               </CardContent>

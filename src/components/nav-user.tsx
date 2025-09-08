@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from 'lucide-react';
+import { ChevronsUpDown, LogOut } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -24,19 +17,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { useAuth } from '@/hooks/use-auth';
 import { User } from '@supabase/supabase-js';
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
 
-  let displayUser: { name: string; email: string; avatar: string } = {
+  const displayUser: { name: string; email: string; avatar: string } = {
     name: user.user_metadata.fullname,
     email: user.email!,
     avatar: user.user_metadata.avatar_url || '',
   };
-
-  displayUser;
 
   if (!displayUser) return null;
   return (
@@ -99,6 +89,7 @@ export function NavUser({ user }: { user: User }) {
                     alert('Logout failed');
                   }
                 } catch (err) {
+                  console.error(err);
                   alert('Logout error');
                 }
               }}

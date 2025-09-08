@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: agencies, error } = await supabase.rpc('get_user_agencies', {
+  const { data: agencies } = await supabase.rpc('get_user_agencies', {
     user_id: user!.id,
   });
 
