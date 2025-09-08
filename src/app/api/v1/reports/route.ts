@@ -381,6 +381,9 @@ export async function POST(req: NextRequest) {
       callback_url: `${process.env.BASE_URL}/api/v1/reports/callback`,
     };
 
+    console.log('Webhook payload:', webhookPayload);
+    console.log('Sending webhook to N8N...', process.env.N8N_WEBHOOK_URL!);
+
     // Send webhook to N8N
     fetch(process.env.N8N_WEBHOOK_URL!, {
       method: 'POST',
