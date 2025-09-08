@@ -22,6 +22,7 @@ export async function POST(request: Request) {
   }
 
   // Only allow login if user is super admin
+  console.log('User metadata:', data.user.user_metadata);
   const isSuperAdmin = data.user.user_metadata?.role === 'admin';
 
   if (isSuperAdmin) {
