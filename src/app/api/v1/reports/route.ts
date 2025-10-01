@@ -273,6 +273,7 @@ export async function POST(req: NextRequest) {
         agencySettings,
         client.name,
         mediaPlanFilename,
+        client.settings,
       );
       console.log('Media plan upload result:', uploadedFiles.media_plan);
 
@@ -285,6 +286,7 @@ export async function POST(req: NextRequest) {
         agencySettings,
         client.name,
         mediaResultsFilename,
+        client.settings,
       );
       console.log('Media results upload result:', uploadedFiles.media_results);
     } catch (error) {
@@ -338,6 +340,7 @@ export async function POST(req: NextRequest) {
       client: {
         id: client.id,
         name: client.name,
+        settings: client.settings || {},
       },
       agency: {
         id: agency.id,
@@ -377,6 +380,7 @@ export async function POST(req: NextRequest) {
         provider: storageProvider,
         access_token: accessToken,
         settings: agencySettings,
+        refresh_token: integration.refresh_token,
       },
       callback_url: `${process.env.BASE_URL}/api/v1/reports/callback`,
     };
@@ -417,6 +421,7 @@ async function uploadFileToStorage(
   agencySettings: any,
   clientName: string,
   fileName: string,
+  clientSettings?: { data: string; templates: string; reports: string } | null,
 ): Promise<{ id: string | null; url: string | null }> {
   if (provider === 'google_drive') {
     const dataFolder = await getGoogleDriveDataFolder(
@@ -424,11 +429,12 @@ async function uploadFileToStorage(
       clientName,
       agencySettings,
     );
+
     if (dataFolder) {
       return await uploadFileToGoogleDrive(
         accessToken,
         file,
-        dataFolder,
+        clientSettings ? clientSettings.data : dataFolder,
         fileName,
       );
     }

@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
           {
             method: 'POST',
             headers: {
-              Authorization: `Bearer ${integration.access_token}`,
+              Authorization: `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
@@ -373,6 +373,11 @@ export async function POST(req: NextRequest) {
         slides_template_json: uploadedFiles.slides_json.url,
         slides_template_json_id: uploadedFiles.slides_json.id,
         agency_id: agency.id,
+        settings: {
+          templates: folderStructure.templates,
+          data: folderStructure.data,
+          reports: folderStructure.reports,
+        },
       })
       .select('*')
       .single();
