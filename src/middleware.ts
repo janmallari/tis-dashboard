@@ -4,8 +4,6 @@ import { updateSession } from '@/lib/supabase/middleware';
 export async function middleware(request: NextRequest) {
   const { user, supabaseResponse } = await updateSession(request);
 
-  console.log(user);
-
   if (
     user &&
     user?.user_metadata.role === 'admin' &&
